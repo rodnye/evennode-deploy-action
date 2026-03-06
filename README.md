@@ -4,7 +4,7 @@ GitHub Action for seamless deployment to [EvenNode](https://www.evennode.com) pl
 
 > [!NOTE]
 > This action requires an `EvenNode repository URL` and `SSH key` authorization.
->   
+>
 > If you're not familiar with these, please refer to the documentation about deploying an EvenNode application and generating an SSH key for upload:
 > https://www.evennode.com/docs/git-deployment
 
@@ -23,20 +23,19 @@ name: Deploy to EvenNode
 
 on:
   push:
-    branches: [ main ]
+    branches: [main]
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      
+
       - name: Deploy to EvenNode
         uses: rodnye/evennode-deploy-action@v1
         with:
           key: ${{ secrets.EVENNODE_SSH_KEY }}
-          git_url: 'git@git.evennode.com:the-repo.git'
-          dot_env: ${{ secrets.DOT_ENV }}
+          git_url: ${{ secrets.EVENNODE_GIT_URL }}
 ```
 
 ## Recommended Usage
@@ -46,14 +45,14 @@ name: Deploy to EvenNode
 
 on:
   push:
-    branches: [ main ]
+    branches: [main]
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      
+
       - name: Deploy to EvenNode
         uses: rodnye/evennode-deploy-action@v1
         with:
@@ -66,22 +65,23 @@ jobs:
 ```
 
 **Why use secrets for credentials?**
+
 - Allows different team members to use their own credentials
 - Enables easy rotation of credentials without code changes
 
 ## Inputs
 
-| Input | Required | Default | Description |
-|-------|----------|---------|-------------|
-| `key` | Yes | - | SSH private key for EvenNode |
-| `git_url` | Yes | - | EvenNode Git repository URL |
-| `dot_env` | No | - | Content for .env file |
-| `commit_message` | No | `[evennode production build]` | Custom commit message |
-| `git_email` | No | `41898282+github-actions[bot]@users.noreply.github.com` | Git email for push |
-| `git_name` | No | `github-actions[bot]` | Git name for push |
-| `branch` | No | `main` | Branch to push |
-| `pre_commit_command` | No | - | Command to run before committing changes (e.g. build commands or adding build artifacts) |
-| `pre_push_command` | No | - | Command to run before pushing to EvenNode |
+| Input                | Required | Default                                                 | Description                                                                              |
+| -------------------- | -------- | ------------------------------------------------------- | ---------------------------------------------------------------------------------------- |
+| `key`                | Yes      | -                                                       | SSH private key for EvenNode                                                             |
+| `git_url`            | Yes      | -                                                       | EvenNode Git repository URL                                                              |
+| `dot_env`            | No       | -                                                       | Content for .env file                                                                    |
+| `commit_message`     | No       | `[evennode production build]`                           | Custom commit message                                                                    |
+| `git_email`          | No       | `41898282+github-actions[bot]@users.noreply.github.com` | Git email for push                                                                       |
+| `git_name`           | No       | `github-actions[bot]`                                   | Git name for push                                                                        |
+| `branch`             | No       | `main`                                                  | Branch to push                                                                           |
+| `pre_commit_command` | No       | -                                                       | Command to run before committing changes (e.g. build commands or adding build artifacts) |
+| `pre_push_command`   | No       | -                                                       | Command to run before pushing to EvenNode                                                |
 
 ## About pre_commit_command
 
