@@ -14,7 +14,7 @@ GitHub Action for seamless deployment to [EvenNode](https://www.evennode.com) pl
 - Automatic .env file configuration
 - Custom pre-commit and pre-push commands
 - Flexible branch targeting
-- Force push control
+- Fresh git history initialization to prevent shadow push errors
 
 ## Basic Usage
 
@@ -35,8 +35,6 @@ jobs:
         uses: rodnye/evennode-deploy-action@v1
         with:
           key: ${{ secrets.EVENNODE_SSH_KEY }}
-          git_email: 'john@example.com'
-          git_name: 'John Peterson'
           git_url: 'git@git.evennode.com:the-repo.git'
           dot_env: ${{ secrets.DOT_ENV }}
 ```
@@ -60,10 +58,11 @@ jobs:
         uses: rodnye/evennode-deploy-action@v1
         with:
           key: ${{ secrets.EVENNODE_SSH_KEY }}
-          git_email: ${{ secrets.GIT_EMAIL }}
-          git_name: ${{ secrets.GIT_NAME }}
           git_url: ${{ secrets.EVENNODE_GIT_URL }}
           dot_env: ${{ secrets.DOT_ENV }}
+          pre_commit_command: |
+            npm run build
+            git add ./dist -f
 ```
 
 **Why use secrets for credentials?**
@@ -72,18 +71,17 @@ jobs:
 
 ## Inputs
 
-| Input | Required | Description |
-|-------|----------|-------------|
-| `key` | Yes | SSH private key for EvenNode |
-| `git_email` | Yes | Git email for commits |
-| `git_name` | Yes | Git username for commits |
-| `git_url` | Yes | EvenNode Git repository URL |
-| `dot_env` | No | Content for .env file |
-| `commit_message` | No | Custom commit message |
-| `branch` | No | Target branch (default: main) |
-| `pre_commit_command` | No | Command to run before commit (e.g. build commands or adding build artifacts) |
-| `pre_push_command` | No | Command to run before push |
-| `force_push` | No | Force push (default: true) |
+| Input | Required | Default | Description |
+|-------|----------|---------|-------------|
+| `key` | Yes | - | SSH private key for EvenNode |
+| `git_url` | Yes | - | EvenNode Git repository URL |
+| `dot_env` | No | - | Content for .env file |
+| `commit_message` | No | `[evennode production build]` | Custom commit message |
+| `git_email` | No | `41898282+github-actions[bot]@users.noreply.github.com` | Git email for push |
+| `git_name` | No | `github-actions[bot]` | Git name for push |
+| `branch` | No | `main` | Branch to push |
+| `pre_commit_command` | No | - | Command to run before committing changes (e.g. build commands or adding build artifacts) |
+| `pre_push_command` | No | - | Command to run before pushing to EvenNode |
 
 ## About pre_commit_command
 
