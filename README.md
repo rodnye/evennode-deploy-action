@@ -32,13 +32,13 @@ jobs:
       - uses: actions/checkout@v4
 
       - name: Deploy to EvenNode
-        uses: rodnye/evennode-deploy-action@v1
+        uses: rodnye/evennode-deploy-action@v2
         with:
           key: ${{ secrets.EVENNODE_SSH_KEY }}
           git_url: ${{ secrets.EVENNODE_GIT_URL }}
 ```
 
-## Recommended Usage
+## Example recommended Usage
 
 ```yaml
 name: Deploy to EvenNode
@@ -54,7 +54,7 @@ jobs:
       - uses: actions/checkout@v4
 
       - name: Deploy to EvenNode
-        uses: rodnye/evennode-deploy-action@v1
+        uses: rodnye/evennode-deploy-action@v2
         with:
           key: ${{ secrets.EVENNODE_SSH_KEY }}
           git_url: ${{ secrets.EVENNODE_GIT_URL }}
