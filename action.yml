@@ -1,54 +1,66 @@
-name: "EvenNode Deploy"
-description: "Deploy an application to EvenNode"
-author: "Rodny Estrada"
+name: 'EvenNode Deploy'
+description: 'Deploy an application to EvenNode'
+author: 'Rodny Estrada'
 
 branding:
-  icon: "upload-cloud"
-  color: "purple"
+  icon: 'upload-cloud'
+  color: 'purple'
 
 inputs:
   key:
-    description: "SSH private key for deployment"
-    required: true
-  git_email:
-    description: "Git email for commit"
-    required: true
-  git_name:
-    description: "Git name for commit"
+    description: 'SSH private key for deployment'
     required: true
   git_url:
-    description: "EvenNode repository URL"
+    description: 'EvenNode repository URL'
     required: true
   dot_env:
-    description: "Content of .env file"
+    description: 'Content of .env file'
     required: false
   commit_message:
-    description: "Custom commit message"
+    description: 'Custom commit message'
+    default: '[evennode production build]'
     required: false
+  git_email:
+    description: 'Git email for push'
+    required: false
+    default: '41898282+github-actions[bot]@users.noreply.github.com'
+  git_name:
+    description: 'Git name for push'
+    required: false
+    default: 'github-actions[bot]'
   branch:
-    description: "Branch to push to"
+    description: 'Branch to push (default: main)'
     required: false
+    default: main
   pre_commit_command:
-    description: "Command to run before committing changes"
+    description: 'Command to run before committing changes'
     required: false
   pre_push_command:
-    description: "Command to run before pushing to EvenNode"
+    description: 'Command to run before pushing to EvenNode'
     required: false
 
 runs:
-  using: "composite"
+  using: 'composite'
   steps:
     - name: Install SSH key
       uses: shimataro/ssh-key-action@v2
       with:
         key: ${{ inputs.key }}
-        known_hosts: " "
+        known_hosts: ' '
 
     - name: Add git.evennode.com to known_hosts
       shell: bash
       run: |
         ssh-keyscan -H git.evennode.com > ~/.ssh/known_hosts
-        
+
+    - name: Remove Git history for avoid 'shadow push error'
+      shell: bash
+      run: |
+        rm -rf .git
+        git init
+        git branch -m ${{ inputs.branch }}  
+        git add .
+
     - name: Set Git credentials
       shell: bash
       run: |
@@ -57,12 +69,10 @@ runs:
 
     - name: Prepare .env file
       shell: bash
-      run: |
-        if [ -n "${{ inputs.dot_env }}" ]; then
-          echo "${{ inputs.dot_env }}" > .env
-          git add .env -f
-        fi
       if: inputs.dot_env
+      run: |
+        echo "${{ inputs.dot_env }}" > .env
+        git add .env -f
 
     - name: Run pre-commit commands
       shell: bash
@@ -73,7 +83,7 @@ runs:
     - name: Commit changes
       shell: bash
       run: |
-        git commit -m "${{ inputs.commit_message || '[evennode production build]' }}" || echo "No changes to commit"
+        git commit -m "${{ inputs.commit_message }}" || echo "No changes to commit"
 
     - name: Add EvenNode remote
       shell: bash
@@ -89,4 +99,4 @@ runs:
     - name: Push to EvenNode
       shell: bash
       run: |
-        git push evennode "${{ inputs.branch || 'main' }}" -f
+        git push evennode "${{ inputs.branch }}" -f
